@@ -23,6 +23,8 @@ Output:
 Usage of log-generator:
   -g int
         Number of concurrent generators to use (default 10)
+  -gt int
+        How many entries per second should generate each generator (default 1000)
   -in string
         Name of the input json file (default "input.json")
   -run duration

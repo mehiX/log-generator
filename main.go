@@ -11,7 +11,7 @@ import (
 )
 
 var generators = 10
-var delay = 1 * time.Millisecond
+var generatorThroughput = 1000
 var runFor = 1 * time.Second
 var stats = true
 var inputFile = ""
@@ -20,6 +20,7 @@ func init() {
 	flag.StringVar(&inputFile, "in", "input.json", "Name of the input json file")
 	flag.DurationVar(&runFor, "run", 1*time.Second, "Duration to run for")
 	flag.IntVar(&generators, "g", 10, "Number of concurrent generators to use")
+	flag.IntVar(&generatorThroughput, "gt", 1000, "How many entries per second should generate each generator")
 	flag.BoolVar(&stats, "stats", false, "False to print the actual messages, True to print only stats")
 
 	flag.Parse()
@@ -51,19 +52,16 @@ func main() {
 	in := messageGenerator(done, messages)
 
 	for i := 0; i < generators; i++ {
-		go generate(done, in, out, delay)
+		go generate(done, in, out, time.Second/time.Duration(generatorThroughput))
 	}
 
 	if stats {
-		defer printDuration()()
+		defer printDuration()(&counter)
 	}
 
 	for {
 		select {
 		case <-done.Done():
-			if stats {
-				fmt.Printf("Counter: %d\n", counter)
-			}
 			return
 		case s := <-out:
 			counter++
@@ -75,11 +73,11 @@ func main() {
 
 }
 
-func printDuration() func() {
+func printDuration() func(*int) {
 	now := time.Now()
 
-	return func() {
-		fmt.Printf("Duration: %v\n", time.Since(now))
+	return func(c *int) {
+		fmt.Printf("Messages generated: %d [%v]\n", *c, time.Since(now))
 	}
 }
 
