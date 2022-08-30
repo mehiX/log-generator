@@ -17,6 +17,21 @@ See the help for parameter details:
 go run ./... -h
 ```
 
+Output:
+
+```
+Usage of log-generator:
+  -g int
+        Number of concurrent generators to use (default 10)
+  -in string
+        Name of the input json file (default "input.json")
+  -run duration
+        Duration to run for (default 1s)
+  -stats
+        False to print the actual messages, True to print only stats
+```
+
+
 Example of run: 
 
 ```
